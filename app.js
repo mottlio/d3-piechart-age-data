@@ -1,7 +1,7 @@
 var width = 800;
 var height = 800;
 var minYear = d3.min(birthData, d => d.year);
-
+var maxYear = d3.max(birthData, d => d.year);
 var orderedMonths = ["January", "February", "March", "April", "May", "June", "July", "Agust", "September", "October", "November", "December"];
 var colorScale = d3.scaleOrdinal()
                     .domain(orderedMonths)
@@ -24,6 +24,14 @@ svg
         .style("font-size", "2em")
         .style("text-anchor", "middle");
 
+d3.select("input")
+    .property("min", minYear)
+    .property("max", maxYear)
+    .property("value", minYear)
+    .on("input", () => drawGraph(+d3.event.target.value));
+
+drawGraph(minYear);
+
 function drawGraph(year) {
     var yearData = birthData.filter(d => d.year === year);
     var arcs = d3.pie()
@@ -38,4 +46,16 @@ function drawGraph(year) {
                     .selectAll(".arc")
                     .data(arcs(yearData));
 
-            }
+    outer   
+        .enter()
+        .append("path")
+            .classed("arc", true)
+            .attr("fill", d => colorScale(d.data.month))
+        .merge(outer)
+            .attr("d", path);
+    
+    d3.select(".title")
+        .text("Births by month and quarter for " + year);
+                    
+
+}
